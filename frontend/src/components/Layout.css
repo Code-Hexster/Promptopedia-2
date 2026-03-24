@@ -1,0 +1,22 @@
+.layout-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #fafafa;
+}
+
+.main-content {
+    margin-left: 260px;
+    padding: 2.5rem 4rem;
+    width: calc(100% - 260px);
+    max-width: 1600px;
+    min-height: 100vh;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .main-content {
+        padding: 2rem;
+    }
+}
