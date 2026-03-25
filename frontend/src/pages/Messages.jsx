@@ -4,6 +4,7 @@ import axios from '../api/axios';
 import AuthContext from '../context/AuthContext';
 import { Send, Check, CheckCheck } from 'lucide-react';
 import { io } from 'socket.io-client';
+import UserAvatar from '../components/ui/UserAvatar';
 
 export default function Messages() {
     const { user } = useContext(AuthContext);
@@ -16,9 +17,9 @@ export default function Messages() {
     const [onlineUsers, setOnlineUsers] = useState([]);
     const socket = useRef();
     const messagesEndRef = useRef(null);
-
     useEffect(() => {
-        socket.current = io('http://localhost:5000');
+        // Connect to the correct backend port (5001) instead of 5000
+        socket.current = io('http://localhost:5001');
 
         socket.current.on('getMessage', (data) => {
             setArrivalMessage({
@@ -171,13 +172,7 @@ export default function Messages() {
                                 }}
                             >
                                 <div style={{ position: 'relative' }}>
-                                    <div style={{
-                                        width: '40px', height: '40px', borderRadius: '50%',
-                                        backgroundColor: '#e5e7eb', display: 'flex', justifyContent: 'center',
-                                        alignItems: 'center', fontWeight: 600, color: '#4b5563'
-                                    }}>
-                                        {conv.username.charAt(0).toUpperCase()}
-                                    </div>
+                                    <UserAvatar user={conv} size="40px" />
                                     {isUserOnline(conv._id) && (
                                         <div style={{
                                             position: 'absolute', bottom: 0, right: 0, width: '10px', height: '10px',
@@ -198,13 +193,7 @@ export default function Messages() {
                     <>
                         <div style={{ padding: '1rem 2rem', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                             <div style={{ position: 'relative' }}>
-                                <div style={{
-                                    width: '36px', height: '36px', borderRadius: '50%',
-                                    backgroundColor: '#e5e7eb', display: 'flex', justifyContent: 'center',
-                                    alignItems: 'center', fontWeight: 600, color: '#4b5563'
-                                }}>
-                                    {selectedUser.username.charAt(0).toUpperCase()}
-                                </div>
+                                <UserAvatar user={selectedUser} size="36px" />
                                 {isUserOnline(selectedUser._id) && (
                                     <div style={{
                                         position: 'absolute', bottom: 0, right: 0, width: '9px', height: '9px',

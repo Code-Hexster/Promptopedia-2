@@ -2,13 +2,56 @@
     display: flex;
     min-height: 100vh;
     background-color: #fafafa;
+    position: relative;
+}
+
+.mobile-header {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 101;
+}
+
+.mobile-logo {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #bc6a3c;
+}
+
+.mobile-menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #1a1a1a;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-overlay {
+    display: none;
+}
+
+.sidebar-wrapper {
+    height: 100vh;
+    width: 260px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
 }
 
 .main-content {
     margin-left: 260px;
     padding: 2.5rem 4rem;
-    width: calc(100% - 260px);
-    max-width: 1600px;
+    flex: 1;
     min-height: 100vh;
     box-sizing: border-box;
     transition: all 0.3s ease;
@@ -18,5 +61,55 @@
 @media (max-width: 1024px) {
     .main-content {
         padding: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .layout-container {
+        flex-direction: column;
+    }
+
+    .mobile-header {
+        display: flex;
+    }
+
+    .sidebar-wrapper {
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+        width: 280px;
+    }
+
+    .sidebar-wrapper.mobile-open {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 1.5rem;
+    }
+
+    .mobile-overlay {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(4px);
+        z-index: 999;
+        animation: fadeInOverlay 0.3s ease;
+    }
+}
+
+@keyframes fadeInOverlay {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
     }
 }

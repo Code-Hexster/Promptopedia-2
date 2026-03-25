@@ -4,13 +4,17 @@ import PromptCard from '../components/PromptCard';
 import { Search } from 'lucide-react';
 import { CardSkeleton } from '../components/ui/Skeleton';
 import { useToast } from '../context/ToastContext';
+import EmptyState from '../components/ui/EmptyState';
 
 export default function Home() {
     const [prompts, setPrompts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [isSearching, setIsSearching] = useState(false);
+    const [selectedModel, setSelectedModel] = useState('All');
     const { error: toastError } = useToast();
+
+    const models = ['All', 'GPT-4', 'GPT-3.5', 'Midjourney', 'DALL-E 3', 'Stable Diffusion', 'Claude 3', 'Llama 3'];
 
     useEffect(() => {
         fetchPrompts();
@@ -156,15 +160,52 @@ export default function Home() {
                 )}
             </form>
 
-            {prompts.length === 0 ? (
-                <p style={{ textAlign: 'center', color: '#666' }}>{isSearching ? 'No prompts found matching your search.' : 'No prompts found. Be the first to create one!'}</p>
-            ) : (
-                <div className="prompts-grid">
-                    {prompts.map((prompt) => (
-                        <PromptCard key={prompt._id} prompt={prompt} />
-                    ))}
-                </div>
-            )}
+            <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '1rem', marginBottom: '1.5rem', msOverflowStyle: 'none', scrollbarWidth: 'none' }} className="model-filters">
+                {models.map(model => (
+                    <button
+                        key={model}
+                        onClick={() => setSelectedModel(model)}
+                        style={{
+                            padding: '0.4rem 1rem',
+                            borderRadius: '99px',
+                            border: '1px solid #e5e7eb',
+                            backgroundColor: selectedModel === model ? '#1a1a1a' : 'white',
+                            color: selectedModel === model ? 'white' : '#4b5563',
+                            fontWeight: 500,
+                            fontSize: '0.9rem',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap',
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        {model}
+                    </button>
+                ))}
+            </div>
+
+            {(() => {
+                const filteredPrompts = selectedModel === 'All' ? prompts : prompts.filter(p => p.modelUsed === selectedModel);
+
+                if (filteredPrompts.length === 0) {
+                    return (
+                        <EmptyState
+                            icon={isSearching ? 'Search' : 'FolderOpen'}
+                            title={isSearching ? 'No Results Found' : 'No Prompts Found'}
+                            description={isSearching ? "We couldn't find any prompts matching your search tags. Try different keywords!" : `There are no prompts for ${selectedModel} yet.`}
+                            actionLink={isSearching ? null : '/create'}
+                            actionText="Create Prompt"
+                        />
+                    );
+                }
+
+                return (
+                    <div className="prompts-grid">
+                        {filteredPrompts.map((prompt) => (
+                            <PromptCard key={prompt._id} prompt={prompt} />
+                        ))}
+                    </div>
+                );
+            })()}
         </div>
     );
 }

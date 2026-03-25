@@ -7,6 +7,8 @@ import { CardSkeleton, Skeleton } from '../components/ui/Skeleton';
 import { useToast } from '../context/ToastContext';
 import EditProfileModal from '../components/profile/EditProfileModal';
 import FollowListModal from '../components/profile/FollowListModal';
+import UserAvatar from '../components/ui/UserAvatar';
+import EmptyState from '../components/ui/EmptyState';
 import './Profile.css';
 
 export default function Profile() {
@@ -129,13 +131,12 @@ export default function Profile() {
     return (
         <div className="profile-container">
             <div className="profile-header">
-                <div className="profile-avatar-large">
-                    {profileUser.avatar ? (
-                        <img src={profileUser.avatar} alt={profileUser.username} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                    ) : (
-                        profileUser.username.charAt(0).toUpperCase()
-                    )}
-                </div>
+                <UserAvatar
+                    user={profileUser}
+                    size="120px"
+                    className="profile-avatar-large"
+                    style={{ border: '4px solid #ffffff' }}
+                />
 
                 <div className="profile-info">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -207,7 +208,13 @@ export default function Profile() {
                             <PromptCard key={prompt._id} prompt={{ ...prompt, author: profileUser }} />
                         ))
                     ) : (
-                        <p style={{ color: '#666' }}>No prompts posted yet.</p>
+                        <EmptyState
+                            icon="FolderOpen"
+                            title="No Prompts Yet"
+                            description={isOwnProfile ? "You haven't posted any prompts yet. Start sharing your creativity!" : "This user hasn't posted any prompts yet."}
+                            actionLink={isOwnProfile ? '/create' : null}
+                            actionText="Create Prompt"
+                        />
                     )
                 ) : (
                     savedPrompts.length > 0 ? (
@@ -215,7 +222,13 @@ export default function Profile() {
                             <PromptCard key={prompt._id} prompt={prompt} />
                         ))
                     ) : (
-                        <p style={{ color: '#666' }}>No saved prompts yet.</p>
+                        <EmptyState
+                            icon="FolderOpen"
+                            title="No Saved Prompts"
+                            description="You haven't saved any prompts yet. Explore the feed to find inspiration."
+                            actionLink="/"
+                            actionText="Explore Feed"
+                        />
                     )
                 )}
             </div>

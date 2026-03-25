@@ -1,12 +1,16 @@
-import { Link } from 'react-router-dom';
-import { Heart, MessageSquare, ExternalLink, Bookmark } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Heart, MessageSquare, ExternalLink, Bookmark, Copy, Repeat } from 'lucide-react';
 import { useState, useContext, useEffect } from 'react';
 import axios from '../api/axios';
 import AuthContext from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import UserAvatar from './ui/UserAvatar';
 import './PromptCard.css';
 
 export default function PromptCard({ prompt }) {
     const { user } = useContext(AuthContext);
+    const { success } = useToast();
+    const navigate = useNavigate();
     const [likes, setLikes] = useState(prompt.likes || []);
     const [isLiked, setIsLiked] = useState(prompt.likes?.includes(user?._id));
     const [isSaved, setIsSaved] = useState(false);
@@ -43,6 +47,15 @@ export default function PromptCard({ prompt }) {
         } catch (error) {
             console.error('Error saving prompt:', error);
         }
+    };
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(prompt.promptText);
+        success('Copied!', 'Prompt copied to clipboard');
+    };
+
+    const handleRemix = () => {
+        navigate('/create', { state: { remixPrompt: prompt } });
     };
 
     const [showComments, setShowComments] = useState(false);
@@ -87,13 +100,7 @@ export default function PromptCard({ prompt }) {
         <article className="prompt-card">
             <div className="card-header">
                 <Link to={`/profile/${prompt.author?._id}`} className="author-info">
-                    <div className="author-avatar">
-                        {prompt.author?.avatar ? (
-                            <img src={prompt.author.avatar} alt={prompt.author.username} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                        ) : (
-                            prompt.author?.username?.charAt(0) || 'U'
-                        )}
-                    </div>
+                    <UserAvatar user={prompt.author} size="40px" />
                     <div className="author-details">
                         <span className="author-name">{prompt.author?.username || 'Unknown User'}</span>
                         <span className="post-date">{formatDate(prompt.createdAt)}</span>
@@ -151,6 +158,12 @@ export default function PromptCard({ prompt }) {
                 <button className={`action-button ${isSaved ? 'saved' : ''}`} onClick={handleSave}>
                     <Bookmark size={18} fill={isSaved ? '#f59e0b' : 'none'} color={isSaved ? '#f59e0b' : 'currentColor'} />
                 </button>
+                <button className="action-button" onClick={handleCopy} title="Copy Prompt">
+                    <Copy size={18} />
+                </button>
+                <button className="action-button" onClick={handleRemix} title="Remix Prompt">
+                    <Repeat size={18} />
+                </button>
                 {prompt.outputImage && (
                     <a href={prompt.outputImage} target="_blank" rel="noopener noreferrer" className="action-button">
                         <ExternalLink size={18} />
@@ -175,9 +188,7 @@ export default function PromptCard({ prompt }) {
                     <div className="comments-list">
                         {comments.map((comment) => (
                             <div key={comment._id} className="comment-item">
-                                <div className="comment-avatar">
-                                    {comment.user?.username?.charAt(0) || 'U'}
-                                </div>
+                                <UserAvatar user={comment.user} size="32px" />
                                 <div className="comment-content">
                                     <span className="comment-author">{comment.user?.username || 'Unknown'}</span>
                                     <p className="comment-text">{comment.text}</p>

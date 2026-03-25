@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from '../api/axios';
 import Button from '../components/ui/Button';
 import { useToast } from '../context/ToastContext';
@@ -7,6 +7,7 @@ import './CreatePrompt.css';
 
 export default function CreatePrompt() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { success, error: toastError } = useToast();
     const [title, setTitle] = useState('');
     const [modelUsed, setModelUsed] = useState('GPT-4');
@@ -17,11 +18,34 @@ export default function CreatePrompt() {
     const [tagInput, setTagInput] = useState('');
     const [loading, setLoading] = useState(false);
 
+    useEffect(() => {
+        if (location.state?.remixPrompt) {
+            const { title: remixTitle, promptText: remixText, modelUsed: remixModel, tags: remixTags } = location.state.remixPrompt;
+            setTitle(`Remix: ${remixTitle || ''}`);
+            setPromptText(remixText || '');
+            setModelUsed(remixModel || 'GPT-4');
+            setTags(remixTags || []);
+            // Clear state to prevent infinite remix loops on refresh
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state]);
+
     const handleTagKeyDown = (event) => {
-        if (event.key === 'Enter' && tagInput.trim()) {
+        if ((event.key === 'Enter' || event.key === ',') && tagInput.trim()) {
             event.preventDefault();
-            if (!tags.includes(tagInput.trim())) {
-                setTags([...tags, tagInput.trim()]);
+            const cleanTag = tagInput.replace(/,/g, '').trim();
+            if (cleanTag && !tags.includes(cleanTag)) {
+                setTags([...tags, cleanTag]);
+            }
+            setTagInput('');
+        }
+    };
+
+    const handleTagBlur = () => {
+        if (tagInput.trim()) {
+            const cleanTag = tagInput.replace(/,/g, '').trim();
+            if (cleanTag && !tags.includes(cleanTag)) {
+                setTags([...tags, cleanTag]);
             }
             setTagInput('');
         }
@@ -106,7 +130,8 @@ export default function CreatePrompt() {
                                     value={tagInput}
                                     onChange={(e) => setTagInput(e.target.value)}
                                     onKeyDown={handleTagKeyDown}
-                                    placeholder="Add tag + Enter"
+                                    onBlur={handleTagBlur}
+                                    placeholder="Add tag + Enter or Comma"
                                 />
                             </div>
                         </div>

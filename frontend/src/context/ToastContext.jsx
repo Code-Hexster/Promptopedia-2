@@ -1,58 +1,50 @@
-import { createContext, useContext, useState, useCallback } from 'react';
-import { X, CheckCircle, AlertCircle, Info } from 'lucide-react';
-import '../components/ui/Toast.css';
+import { createContext, useContext } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import '../components/ui/Toast.css'; // Keeping this in case other components depend on it
 
 const ToastContext = createContext();
 
 export const useToast = () => useContext(ToastContext);
 
 export const ToastProvider = ({ children }) => {
-    const [toasts, setToasts] = useState([]);
+    const defaultStyle = {
+        borderRadius: '12px',
+        background: '#1a1a1a',
+        color: '#ffffff',
+        padding: '16px',
+        fontSize: '14px',
+        fontWeight: '500',
+        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.2)',
+    };
 
-    const addToast = useCallback((type, title, message) => {
-        const id = Date.now();
-        setToasts(prev => [...prev, { id, type, title, message }]);
+    const success = (title, message) => toast.success(message || title, {
+        style: defaultStyle,
+        iconTheme: {
+            primary: '#10b981',
+            secondary: '#ffffff',
+        },
+    });
 
-        setTimeout(() => {
-            removeToast(id);
-        }, 5000);
-    }, []);
+    const error = (title, message) => toast.error(message || title, {
+        style: defaultStyle,
+        iconTheme: {
+            primary: '#ef4444',
+            secondary: '#ffffff',
+        },
+    });
 
-    const removeToast = useCallback((id) => {
-        setToasts(prev => prev.map(t => t.id === id ? { ...t, exiting: true } : t));
-        setTimeout(() => {
-            setToasts(prev => prev.filter(t => t.id !== id));
-        }, 300);
-    }, []);
-
-    const success = (title, message) => addToast('success', title, message);
-    const error = (title, message) => addToast('error', title, message);
-    const info = (title, message) => addToast('info', title, message);
+    const info = (title, message) => toast(message || title, {
+        icon: 'ℹ️',
+        style: defaultStyle,
+    });
 
     return (
         <ToastContext.Provider value={{ success, error, info }}>
             {children}
-            <div className="toast-container">
-                {toasts.map(toast => (
-                    <div key={toast.id} className={`toast ${toast.type} ${toast.exiting ? 'exiting' : ''}`}>
-                        {toast.type === 'success' && <CheckCircle size={20} color="#10b981" />}
-                        {toast.type === 'error' && <AlertCircle size={20} color="#ef4444" />}
-                        {toast.type === 'info' && <Info size={20} color="#3b82f6" />}
-
-                        <div className="toast-content">
-                            <h4 className="toast-title">{toast.title}</h4>
-                            {toast.message && <p className="toast-message">{toast.message}</p>}
-                        </div>
-
-                        <button
-                            onClick={() => removeToast(toast.id)}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af' }}
-                        >
-                            <X size={16} />
-                        </button>
-                    </div>
-                ))}
-            </div>
+            <Toaster
+                position="bottom-center"
+                toastOptions={{ duration: 4000 }}
+            />
         </ToastContext.Provider>
     );
 };

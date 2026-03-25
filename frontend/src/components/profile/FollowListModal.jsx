@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import UserAvatar from '../ui/UserAvatar';
 import './FollowListModal.css';
 
 export default function FollowListModal({ title, users, onClose }) {
@@ -19,13 +20,7 @@ export default function FollowListModal({ title, users, onClose }) {
                                 className="user-item-link"
                                 onClick={onClose}
                             >
-                                <div className="user-item-avatar">
-                                    {user.avatar ? (
-                                        <img src={user.avatar} alt={user.username} />
-                                    ) : (
-                                        user.username.charAt(0).toUpperCase()
-                                    )}
-                                </div>
+                                <UserAvatar user={user} size="48px" />
                                 <div className="user-item-info">
                                     <span className="user-item-username">{user.username}</span>
                                     {user.bio && <span className="user-item-bio">{user.bio}</span>}
