@@ -42,5 +42,6 @@
 
 ## Troubleshooting
 
+*   **Build Errors on Render (`Cannot find module ... dist/server.js`):** Render installs only regular `dependencies` by default. We have moved `typescript` and `@types/*` to standard `dependencies` in `backend/package.json` to ensure `dist/server.js` is built successfully.
 *   **CORS Issues:** If you see CORS errors in the browser console, double-check that `CLIENT_URL` in Render matches your Vercel URL exactly (no trailing slashes usually).
 *   **Socket.io:** If chat doesn't connect, ensure the socket client in `Messages.jsx` and `server.ts` are using the correct URLs. The `VITE_API_URL` should handle the HTTP requests, but Socket.io might need the base URL without `/api`. (Current implementation uses `baseURL` from axios which includes `/api`. You might need to adjust `socket = io(baseURL.replace('/api', ''))`).
