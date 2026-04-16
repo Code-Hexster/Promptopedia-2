@@ -52,7 +52,7 @@ export default function Login() {
                             className="form-input"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="••••••••"
+                            placeholder="Enter password"
                             required
                         />
                     </div>

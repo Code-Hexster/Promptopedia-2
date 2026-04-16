@@ -72,7 +72,7 @@ export default function Register() {
                             className="form-input"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="••••••••"
+                            placeholder="Enter password"
                             required
                         />
                     </div>
@@ -83,7 +83,7 @@ export default function Register() {
                             className="form-input"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            placeholder="••••••••"
+                            placeholder="Confirm password"
                             required
                         />
                     </div>
